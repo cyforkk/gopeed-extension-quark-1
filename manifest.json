@@ -2,9 +2,9 @@
     "name": "gopeed-extension-quark",
     "author": "muyan556",
     "title": "夸克网盘下载",
-    "description": "支持夸克网盘下载,推荐连接数为256",
+    "description": "支持夸克网盘链接解析下载，推荐连接数设置为256",
     "icon": "icon.png",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "homepage": "https://github.com/muyan556/gopeed-extension-quark",
     "repository": {
         "url": "https://github.com/muyan556/gopeed-extension-quark"
@@ -14,7 +14,8 @@
             "event": "onResolve",
             "match": {
                 "urls": [
-                    "*://pan.quark.cn/s/*"
+                    "*://pan.quark.cn/s/*",
+                    "*://drive.quark.cn/s/*"
                 ]
             },
             "entry": "index.js"
@@ -24,39 +25,40 @@
         {
             "name": "cookie",
             "title": "夸克 Cookie",
-            "description": "从浏览器开发者工具中复制完整的 Cookie 字符串（登录 pan.quark.cn 后 F12 → Network → list请求 → Cookies 值）",
+            "description": "请使用浏览器无痕模式登录 pan.quark.cn 后，F12抓包复制请求头中的 Cookie 值填入",
             "type": "string",
             "value": ""
         },
         {
             "name": "save_mode",
-            "title": "转存模式",
-            "description": "智能批量：优先批量转存，空间不足自动切逐个转存；强制逐个：每次只转存1个文件，适合总空间10GB，解析速度较慢 ",
-            "type": "number",
+            "title": "分块转存策略",
+            "description": "遇到超大文件(夹)时，决定解析策略",
+            "type": "string",
             "value": "1",
             "options": [
                 {
-                    "label": "智能批量",
+                    "label": "智能分块 (默认)",
                     "value": "1"
                 },
                 {
-                    "label": "逐个转存",
+                    "label": "慢速模式",
                     "value": "2"
                 }
             ]
         },
         {
             "name": "delete_file",
-            "title": "获取到文件下载链接后删除转存文件",
-            "type": "number",
+            "title": "解析完毕后释放网盘空间",
+            "description": "提取链接后自动将转存的文件删除",
+            "type": "string",
             "value": "1",
             "options": [
                 {
-                    "label": "是",
+                    "label": "开启 (默认)",
                     "value": "1"
                 },
                 {
-                    "label": "否",
+                    "label": "关闭",
                     "value": "0"
                 }
             ]
