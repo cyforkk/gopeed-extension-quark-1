@@ -2,13 +2,33 @@
 
 Gopeed 扩展，用于解析夸克网盘分享链接并下载文件。
 
+## 项目结构
+
+```
+quark-sdk/
+├── index.js          # 源码
+├── dist/
+│   └── index.js      # 打包后的文件
+├── package.json      # 依赖配置
+├── webpack.config.js # 打包配置
+├── manifest.json     # 扩展配置
+└── README.md         # 说明文档
+```
+
+## 打包
+
+```bash
+npm install
+npm run build
+```
+
 ## 安装
 
-### 方法 1: 通过 Gopeed 扩展商店安装（如果已发布）
+### 方法 1: 通过 Gopeed 扩展商店安装
 
 1. 打开 Gopeed
 2. 进入「扩展」页面
-3. 搜索「夸克网盘」或输入仓库地址(`https://github.com/muyan556/gopeed-extension-quark`)
+3. 搜索「夸克网盘」或输入仓库地址
 4. 点击安装
 
 ### 方法 2: 本地安装
@@ -19,112 +39,74 @@ Gopeed 扩展，用于解析夸克网盘分享链接并下载文件。
 4. 点击「安装本地扩展」(连点下载图标5次)
 5. 选择包含 `manifest.json` 的文件夹
 
-## 功能特性
-
-- ✅ 支持夸克网盘分享链接解析
-- ✅ 支持密码保护的分享链接
-- ✅ 自动递归处理文件夹，获取所有文件
-- ✅ 支持多文件批量下载
-
 ## 配置
 
-扩展需要你的夸克账号 Cookie 才能工作。我们提供了一种方式获取 Cookie：
+### 夸克 Cookie
 
-### 方法 1：手动获取 Cookie
-
-1. 使用浏览器（Chrome/Edge/Firefox）访问 [https://pan.quark.cn/](https://pan.quark.cn/)
+1. 使用浏览器访问 [https://pan.quark.cn/](https://pan.quark.cn/)
 2. 登录你的夸克账号
 3. 按 `F12` 打开开发者工具
-4. 切换到 `Application`（Chrome/Edge）或 `存储`（Firefox）标签页
-5. 在左侧找到 `Cookies` → `https://pan.quark.cn`
-6. 复制所有 Cookie（建议复制完整的 Cookie 字符串，格式类似：`key1=value1; key2=value2; ...`）
-7. 打开 Gopeed 的扩展设置
-8. 找到本扩展，点击设置
-9. 将复制的 Cookie 粘贴到「夸克 Cookie」设置项中
-10. 保存设置
-
-### Cookie 获取详细说明
-
-在开发者工具的 Cookies 页面，你会看到多个 Cookie 项，需要的主要 Cookie 包括但不限于：
-- `__puus`
-- `__pus`
-- 其他认证相关的 Cookie
-
-**建议**：直接复制整个页面显示的所有 Cookie，格式化为 `key1=value1; key2=value2` 的形式。
-
-## 使用方法
-
-1. 复制夸克网盘分享链接，格式如下：
-   - `https://pan.quark.cn/s/abc123def456`
-   - `https://pan.quark.cn/s/abc123def456?pwd=1234` (带密码)
-   
-2. 在 Gopeed 中创建新下载任务
-
-3. 粘贴分享链接
-
-4. Gopeed 会自动调用本扩展解析链接
-
-5. 选择要下载的文件（或全部下载）
-
-6. 开始下载
+4. 切换到 `Network` 标签页
+5. 找到 list 请求，复制 `Request Headers` 中的 `Cookie` 值
+6. 在 Gopeed 扩展设置中粘贴
 
 ## 支持的链接格式
 
 - 标准分享链接: `https://pan.quark.cn/s/xxxxxxxxx`
 - 带密码的分享: `https://pan.quark.cn/s/xxxxxxxxx?pwd=1234`
+- 带目录的分享: `https://pan.quark.cn/s/xxxxxxxxx#/list/share/folderid`
+
+## 功能特性
+
+### 事件处理
+
+- **onResolve**: 解析链接，获取文件列表和下载直链
+- **onStart**: 下载开始时检查链接是否过期，自动刷新（此方法来自 [foxxorcat@gopeed-extention-quarkuc](https://github.com/foxxorcat/gopeed-extention/tree/main/gopeed-extention-quarkuc)）
+
+### __puus 自动刷新
+
+夸克网盘会定期刷新 `__puus` cookie 值。本扩展使用 superagent 库，每次请求后自动检查响应头中的 `set-cookie`，如果包含 `__puus` 则自动更新。这可以避免长时间使用时 Cookie 失效的问题。
+
+### 分页解析
+
+自动分页获取文件列表，支持超大文件夹（超过 1000 个文件）。
+
+### 智能分块转存
+
+根据网盘可用空间，自动将文件分批转存，支持"边存边删"模式。
+
+## 致谢
+
+- [foxxorcat](https://github.com/foxxorcat) - onStart 链接刷新机制、__puus 刷新机制
+- 小米 MiMo - AI 代码助手
 
 ## 常见问题
 
 ### 1. 提示「未配置 Cookie」
 
-请确保已在扩展设置中正确配置夸克 Cookie。Cookie 必须来自已登录的夸克账号。
+请确保已在扩展设置中正确配置夸克 Cookie。
 
-### 2. 提示「获取 Token 失败」
+### 2. 提示「Cookie 已失效」
 
-可能的原因：
-- Cookie 已过期，需要重新登录夸克网盘并获取新的 Cookie
-- 分享链接需要密码，但 URL 中没有包含密码参数
-- 分享链接已失效或被取消
+Cookie 已过期，需要重新登录夸克网盘并获取新的 Cookie。
 
 ### 3. 提示「触发 23018 限制」
 
-这是夸克对大文件下载的限制。本扩展已使用PC端的 User-Agent 绕过此限制。如果仍然出现此错误，可能是夸克更新了限制策略。
+夸克对大文件下载的限制。本扩展已使用 PC 端的 User-Agent 绕过此限制。
 
 ### 4. 下载速度慢
 
-本扩展解析出的是夸克官方下载链接，下载速度取决于：
+下载速度取决于：
 - 你的夸克账号类型（普通/会员）
 - 你的网络状况
 - 夸克服务器的限速策略
 
-## 工作原理
-
-1. 解析分享链接，提取分享 ID 和密码
-2. 使用你的 Cookie 请求夸克 API 获取分享 Token
-3. 遍历分享内容，递归获取所有文件（包括文件夹内的文件）
-4. 将文件临时转存到你的网盘（占用云盘空间）
-5. 获取所有文件的直接下载链接
-6. 返回给 Gopeed 进行下载
-
-## 注意事项
-
-- Cookie 包含你的账号认证信息，请勿分享给他人
-- 本扩展不会上传或窃取你的 Cookie
-- 所有 API 请求都是直接向夸克官方服务器发起
-- 转存操作会占用你的网盘空间!(请及时清理)
-
-## 说明
-
-夸克网盘普通用户下载速度会比较慢，如果想要提高下载速度，建议下载连接数使用`256`。
+建议下载连接数设置为 `256`。
 
 ## 免责声明
 
-本扩展仅供学习交流使用，项目中所涉及的接口均来自夸克官方,需要使用自己的夸克网盘账号才能获取下载链接,代码全部开源,请勿用于商业用途。使用本扩展产生的任何后果由使用者自行承担。
+本扩展仅供学习交流使用，项目中所涉及的接口均来自夸克官方。需要使用自己的夸克网盘账号才能获取下载链接。代码全部开源，请勿用于商业用途。
 
 ## 开源协议
 
 MIT License
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！

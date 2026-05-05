@@ -1,67 +1,66 @@
 {
-    "name": "gopeed-extension-quark",
-    "author": "muyan556",
-    "title": "夸克网盘下载",
-    "description": "支持夸克网盘链接解析下载，推荐连接数设置为256",
-    "icon": "icon.png",
-    "version": "1.0.3",
-    "homepage": "https://github.com/muyan556/gopeed-extension-quark",
-    "repository": {
-        "url": "https://github.com/muyan556/gopeed-extension-quark"
+  "name": "gopeed-extension-quark",
+  "author": "muyan556",
+  "title": "夸克网盘下载",
+  "description": "支持夸克网盘链接解析下载，推荐连接数设置为256",
+  "icon": "icon.png",
+  "version": "1.0.4",
+  "homepage": "https://github.com/muyan556/gopeed-extension-quark",
+  "repository": {
+    "url": "https://github.com/muyan556/gopeed-extension-quark"
+  },
+  "scripts": [
+    {
+      "event": "onResolve",
+      "match": {
+        "urls": [
+          "*://pan.quark.cn/s/*",
+          "*://drive.quark.cn/s/*"
+        ]
+      },
+      "entry": "dist/index.js"
     },
-    "scripts": [
+    {
+      "event": "onStart",
+      "match": {
+        "labels": [
+          "muyan556@gopeed-extension-quark"
+        ]
+      },
+      "entry": "dist/index.js"
+    }
+  ],
+  "settings": [
+    {
+      "name": "cookie",
+      "title": "夸克 Cookie",
+      "description": "请使用浏览器无痕模式登录 pan.quark.cn 后，F12抓包list复制请求头中的 Cookie 值填入",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "delete_file",
+      "title": "解析完毕后释放网盘空间",
+      "description": "提取链接后自动将转存的文件删除",
+      "type": "string",
+      "value": "1",
+      "options": [
         {
-            "event": "onResolve",
-            "match": {
-                "urls": [
-                    "*://pan.quark.cn/s/*",
-                    "*://drive.quark.cn/s/*"
-                ]
-            },
-            "entry": "index.js"
-        }
-    ],
-    "settings": [
-        {
-            "name": "cookie",
-            "title": "夸克 Cookie",
-            "description": "请使用浏览器无痕模式登录 pan.quark.cn 后，F12抓包复制请求头中的 Cookie 值填入",
-            "type": "string",
-            "value": ""
+          "label": "开启 (默认)",
+          "value": "1"
         },
         {
-            "name": "save_mode",
-            "title": "分块转存策略",
-            "description": "遇到超大文件(夹)时，决定解析策略",
-            "type": "string",
-            "value": "1",
-            "options": [
-                {
-                    "label": "智能分块 (默认)",
-                    "value": "1"
-                },
-                {
-                    "label": "慢速模式",
-                    "value": "2"
-                }
-            ]
-        },
-        {
-            "name": "delete_file",
-            "title": "解析完毕后释放网盘空间",
-            "description": "提取链接后自动将转存的文件删除",
-            "type": "string",
-            "value": "1",
-            "options": [
-                {
-                    "label": "开启 (默认)",
-                    "value": "1"
-                },
-                {
-                    "label": "关闭",
-                    "value": "0"
-                }
-            ]
+          "label": "关闭",
+          "value": "0"
         }
-    ]
+      ]
+    },
+    {
+      "name": "max_file_count",
+      "title": "最大解析文件数量",
+      "description": "限制解析文件数量，0 表示无限制",
+      "type": "number",
+      "value": "500"
+    }
+  ]
 }
